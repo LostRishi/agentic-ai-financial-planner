@@ -11,8 +11,7 @@ This Streamlit app is an AI-powered personal finance planner that generates pers
 1. Clone the GitHub repository
 
 ```bash
-git clone https://github.com/Shubhamsaboo/awesome-llm-apps.git
-cd awesome-llm-apps/ai_agent_tutorials/ai_personal_finance_agent
+git clone https://github.com/LostRishi/agentic-ai-financial-planner.git
 ```
 2. Install the required dependencies:
 

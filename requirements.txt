@@ -2,3 +2,5 @@ streamlit
 phidata
 openai
 google-search-results
+SpeechRecognition
+pyaudio

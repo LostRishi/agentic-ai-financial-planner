@@ -3,6 +3,33 @@ from phi.assistant import Assistant
 from phi.tools.serpapi_tools import SerpApiTools
 import streamlit as st
 from phi.llm.openai import OpenAIChat
+import speech_recognition as sr
+
+# Function to capture speech and convert to text
+def speech_to_text():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        st.info("Listening... Speak now!")
+        try:
+            audio = r.listen(source, timeout=5)
+            st.info("Processing speech...")
+            text = r.recognize_google(audio)
+            return text
+        except sr.WaitTimeoutError:
+            st.error("No speech detected. Please try again.")
+            return None
+        except sr.RequestError:
+            st.error("Could not process speech. Please try again.")
+            return None
+        except sr.UnknownValueError:
+            st.error("Could not understand audio. Please try again.")
+            return None
+
+# Initialize session state
+if 'financial_goals' not in st.session_state:
+    st.session_state.financial_goals = ""
+if 'current_situation' not in st.session_state:
+    st.session_state.current_situation = ""
 
 # Set up the Streamlit app
 st.title("AI Personal Finance Planner 💰")
@@ -58,9 +85,33 @@ if openai_api_key and serp_api_key:
         num_history_messages=3,
     )
 
-    # Input fields for the user's financial goals and current financial situation
-    financial_goals = st.text_input("What are your financial goals?")
-    current_situation = st.text_area("Describe your current financial situation")
+    # Create columns for text input and speech button for financial goals
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        financial_goals = st.text_input(
+            "What are your financial goals?",
+            value=st.session_state.financial_goals
+        )
+    with col2:
+        if st.button("🎤 Record Goals", key="goals_button"):
+            spoken_text = speech_to_text()
+            if spoken_text:
+                st.session_state.financial_goals = spoken_text
+                st.rerun()
+
+    # Create columns for text area and speech button for current situation
+    col3, col4 = st.columns([4, 1])
+    with col3:
+        current_situation = st.text_area(
+            "Describe your current financial situation",
+            value=st.session_state.current_situation
+        )
+    with col4:
+        if st.button("🎤 Record Situation", key="situation_button"):
+            spoken_text = speech_to_text()
+            if spoken_text:
+                st.session_state.current_situation = spoken_text
+                st.rerun()
 
     if st.button("Generate Financial Plan"):
         with st.spinner("Processing..."):
